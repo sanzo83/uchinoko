@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 const STORAGE_KEY = "tasksan.local-tasks.v1"
+const REPORT_STORAGE_KEY = "tasksan.daily-reports.v1"
 const CAT_CHECKLIST = [
   { group: "お迎え前", title: "ケージ・トイレ・ごはん・水を用意する" },
   { group: "お迎え前", title: "キャリーケースを用意する" },
@@ -19,11 +20,13 @@ const CAT_CHECKLIST = [
 const GROUP_ORDER = ["お迎え前", "お迎え当日", "トライアル中", "ほか"]
 
 export default class extends Controller {
-  static targets = ["title", "note", "list", "empty", "count", "backupFile", "backupNotice", "presetNotice"]
+  static targets = ["title", "note", "list", "empty", "count", "backupFile", "backupNotice", "presetNotice", "reportDate", "reportFood", "reportToilet", "reportCondition", "reportNote", "reportQuestion", "reportList", "reportEmpty", "reportCount", "reportNotice"]
 
   connect() {
     this.filterName = "open"
     this.tasks = this.load()
+    this.reports = this.loadReports()
+    this.reportDateTarget.value = this.today()
     this.render()
   }
 
@@ -86,12 +89,70 @@ export default class extends Controller {
     this.presetNoticeTarget.textContent = `${additions.length}件のチェックリストを追加しました。`
   }
 
+  addReport(event) {
+    event.preventDefault()
+    const report = {
+      id: crypto.randomUUID(),
+      date: this.reportDateTarget.value,
+      food: this.reportFoodTarget.value.trim(),
+      toilet: this.reportToiletTarget.value.trim(),
+      condition: this.reportConditionTarget.value.trim(),
+      note: this.reportNoteTarget.value.trim(),
+      question: this.reportQuestionTarget.value.trim(),
+      createdAt: new Date().toISOString()
+    }
+
+    if (!report.date || !this.reportHasContent(report)) {
+      this.setReportNotice("日付と、少なくともひとつの記録を入力してください。")
+      return
+    }
+
+    this.reports.unshift(report)
+    this.saveReports()
+    event.target.reset()
+    this.reportDateTarget.value = this.today()
+    this.renderReports()
+    this.setReportNotice("報告を保存しました。送信用の文章を確認してコピーできます。")
+  }
+
+  async copyReport(event) {
+    const report = this.findReport(event.currentTarget.dataset.reportId)
+    if (!report) return
+
+    const text = this.reportText(report)
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch {
+      const textarea = document.createElement("textarea")
+      textarea.value = text
+      textarea.setAttribute("readonly", "")
+      textarea.style.position = "fixed"
+      textarea.style.opacity = "0"
+      document.body.append(textarea)
+      textarea.select()
+      document.execCommand("copy")
+      textarea.remove()
+    }
+    this.setReportNotice("送信用の文章をコピーしました。LINEなどに貼り付けて送れます。")
+  }
+
+  removeReport(event) {
+    const report = this.findReport(event.currentTarget.dataset.reportId)
+    if (!report || !window.confirm(`${this.formatDate(report.date)}の報告を削除しますか？`)) return
+
+    this.reports = this.reports.filter((item) => item.id !== report.id)
+    this.saveReports()
+    this.renderReports()
+    this.setReportNotice("報告を削除しました。")
+  }
+
   downloadBackup() {
     const backup = {
       format: "tasksan-local-tasks",
-      version: 1,
+      version: 2,
       exportedAt: new Date().toISOString(),
-      tasks: this.tasks
+      tasks: this.tasks,
+      reports: this.reports
     }
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" })
     const url = URL.createObjectURL(blob)
@@ -109,13 +170,15 @@ export default class extends Controller {
 
     try {
       const backup = JSON.parse(await file.text())
-      const tasks = this.validTasks(backup)
-      if (!tasks || !window.confirm("今あるタスクをバックアップの内容で置き換えますか？")) return
+      const restored = this.validBackup(backup)
+      if (!restored || !window.confirm("今あるタスクと報告をバックアップの内容で置き換えますか？")) return
 
-      this.tasks = tasks
+      this.tasks = restored.tasks
+      this.reports = restored.reports
       this.save()
+      this.saveReports()
       this.render()
-      this.setBackupNotice(`${tasks.length}件のタスクを復元しました。`)
+      this.setBackupNotice(`${this.tasks.length}件のタスクと${this.reports.length}件の報告を復元しました。`)
     } catch {
       this.setBackupNotice("このファイルは読み込めませんでした。Tasksanのバックアップを選んでください。")
     } finally {
@@ -134,6 +197,14 @@ export default class extends Controller {
     this.element.querySelectorAll("[data-filter]").forEach((button) => {
       button.classList.toggle("is-active", button.dataset.filter === this.filterName)
     })
+    this.renderReports()
+  }
+
+  renderReports() {
+    const reports = [...this.reports].sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt))
+    this.reportListTarget.replaceChildren(...reports.map((report) => this.reportElement(report)))
+    this.reportEmptyTarget.hidden = reports.length > 0
+    this.reportCountTarget.textContent = reports.length === 0 ? "" : `${reports.length}件`
   }
 
   groupedTaskElements(tasks) {
@@ -185,6 +256,43 @@ export default class extends Controller {
     return item
   }
 
+  reportElement(report) {
+    const item = document.createElement("li")
+    item.className = "report-card"
+
+    const header = document.createElement("div")
+    header.className = "report-card__header"
+    const date = document.createElement("h3")
+    date.className = "report-card__date"
+    date.textContent = this.formatDate(report.date)
+    const remove = document.createElement("button")
+    remove.type = "button"
+    remove.className = "task-card__remove"
+    remove.textContent = "削除"
+    remove.dataset.reportId = report.id
+    remove.addEventListener("click", (event) => this.removeReport(event))
+    header.append(date, remove)
+
+    const details = document.createElement("details")
+    details.className = "report-card__preview"
+    const summary = document.createElement("summary")
+    summary.textContent = "送信用の文章を確認"
+    const text = document.createElement("p")
+    text.className = "report-card__text"
+    text.textContent = this.reportText(report)
+    details.append(summary, text)
+
+    const copy = document.createElement("button")
+    copy.type = "button"
+    copy.className = "button button--secondary report-card__copy"
+    copy.textContent = "文章をコピー"
+    copy.dataset.reportId = report.id
+    copy.addEventListener("click", (event) => this.copyReport(event))
+
+    item.append(header, details, copy)
+    return item
+  }
+
   visible(task) {
     if (this.filterName === "all") return true
     return this.filterName === "done" ? task.completed : !task.completed
@@ -192,6 +300,10 @@ export default class extends Controller {
 
   findTask(id) {
     return this.tasks.find((task) => task.id === id)
+  }
+
+  findReport(id) {
+    return this.reports.find((report) => report.id === id)
   }
 
   load() {
@@ -206,16 +318,48 @@ export default class extends Controller {
     }
   }
 
+  loadReports() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(REPORT_STORAGE_KEY) || "[]")
+      if (!Array.isArray(stored)) return []
+
+      const ids = new Set()
+      return stored.map((report) => this.normalizeReport(report, ids)).filter(Boolean)
+    } catch {
+      return []
+    }
+  }
+
   save() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(this.tasks))
   }
 
-  validTasks(backup) {
-    if (backup?.format !== "tasksan-local-tasks" || backup.version !== 1 || !Array.isArray(backup.tasks)) return null
+  saveReports() {
+    localStorage.setItem(REPORT_STORAGE_KEY, JSON.stringify(this.reports))
+  }
+
+  validBackup(backup) {
+    if (backup?.format !== "tasksan-local-tasks" || ![1, 2].includes(backup.version)) return null
+
+    const tasks = this.validTasks(backup.tasks)
+    const reports = backup.version === 1 ? [] : this.validReports(backup.reports)
+    return tasks && reports ? { tasks, reports } : null
+  }
+
+  validTasks(tasksToValidate) {
+    if (!Array.isArray(tasksToValidate)) return null
 
     const ids = new Set()
-    const tasks = backup.tasks.map((task) => this.normalizeTask(task, ids))
+    const tasks = tasksToValidate.map((task) => this.normalizeTask(task, ids))
     return tasks.every(Boolean) ? tasks : null
+  }
+
+  validReports(reportsToValidate) {
+    if (!Array.isArray(reportsToValidate)) return null
+
+    const ids = new Set()
+    const reports = reportsToValidate.map((report) => this.normalizeReport(report, ids))
+    return reports.every(Boolean) ? reports : null
   }
 
   normalizeTask(task, ids) {
@@ -232,7 +376,67 @@ export default class extends Controller {
     }
   }
 
+  normalizeReport(report, ids) {
+    if (typeof report?.id !== "string" || ids.has(report.id) || !this.validDate(report.date)) return null
+
+    const normalized = {
+      id: report.id,
+      date: report.date,
+      food: this.shortText(report.food),
+      toilet: this.shortText(report.toilet),
+      condition: this.shortText(report.condition),
+      note: this.shortText(report.note),
+      question: this.shortText(report.question),
+      createdAt: typeof report.createdAt === "string" ? report.createdAt : new Date().toISOString()
+    }
+    if (!this.reportHasContent(normalized)) return null
+
+    ids.add(report.id)
+    return normalized
+  }
+
+  reportText(report) {
+    const lines = [
+      `${this.formatDate(report.date)}のご報告です。`,
+      report.food && `・食事・水分：${report.food}`,
+      report.toilet && `・排泄：${report.toilet}`,
+      report.condition && `・元気・体調：${report.condition}`,
+      report.note && `・今日の様子：${report.note}`,
+      report.question && `・相談したいこと：${report.question}`,
+      "よろしくお願いします。"
+    ].filter(Boolean)
+
+    return `${lines.slice(0, 1).join("\n")}\n\n${lines.slice(1, -1).join("\n")}\n\n${lines.at(-1)}`
+  }
+
+  reportHasContent(report) {
+    return [report.food, report.toilet, report.condition, report.note, report.question].some(Boolean)
+  }
+
+  shortText(value) {
+    return typeof value === "string" ? value.trim().slice(0, 500) : ""
+  }
+
+  validDate(value) {
+    return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`))
+  }
+
+  formatDate(value) {
+    const [year, month, day] = value.split("-").map(Number)
+    return `${year}年${month}月${day}日`
+  }
+
+  today() {
+    const now = new Date()
+    const offset = now.getTimezoneOffset() * 60_000
+    return new Date(now.getTime() - offset).toISOString().slice(0, 10)
+  }
+
   setBackupNotice(message) {
     this.backupNoticeTarget.textContent = message
+  }
+
+  setReportNotice(message) {
+    this.reportNoticeTarget.textContent = message
   }
 }
