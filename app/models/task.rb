@@ -8,14 +8,6 @@ class Task < ApplicationRecord
 
   scope :recent, -> { order(created_at: :desc) }
 
-  def self.ransackable_attributes(auth_object = nil)
-    %w[name created_at]
-  end
-
-  def self.ransackable_associations(auth_object = nil)
-    []
-  end
-
   def self.csv_attributes
     ["name", "description", "created_at", "updated_at"]
   end

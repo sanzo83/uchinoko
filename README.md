@@ -1,24 +1,77 @@
-# README
+# うちのこになるまで
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+保護猫を迎える準備を、スマホで気軽に管理するためのタスク管理アプリです。
 
-Things you may want to cover:
+タスクのデータはサーバーには送信されず、使っているブラウザのローカルストレージに保存されます。
 
-* Ruby version
+## できること
 
-* System dependencies
+- タスクと任意のメモの追加
+- 未完了・すべて・完了済みでの絞り込み
+- 保護猫のお迎え前・当日・トライアル中のチェックリストをまとめて追加
+- 食事・排泄・体調などの日次報告の記録と、送信用文章のコピー
+- JSON ファイルへのバックアップと復元
 
-* Configuration
+## 使い方
 
-* Database creation
+1. 「お迎えチェックリストを追加」を押すと、基本の準備項目を一括で追加できます。
+2. 追加したい内容があるときは、「やることを追加」から入力します。
+3. 終わった項目はチェックを付けます。表示は「未完了」「すべて」「完了済み」で切り替えられます。
+4. 「今日の報告」に食事・排泄・体調などを入力すると、保護主さんへ送る文章を確認・コピーできます。
+5. 機種変更やブラウザを替える前には、「バックアップを保存」から JSON ファイルを保存してください。
+6. 新しい環境では「バックアップを復元」からその JSON ファイルを選びます。復元すると、現在のタスクはバックアップの内容で置き換わります。
 
-* Database initialization
+## 開発環境
 
-* How to run the test suite
+- Ruby 3.2.11
+- Rails 8.1
+- SQLite
 
-* Services (job queues, cache servers, search engines, etc.)
+### セットアップ
 
-* Deployment instructions
+```sh
+bundle install
+bin/rails db:prepare
+```
 
-* ...
+### 起動
+
+```sh
+bin/rails server
+```
+
+起動後、[http://localhost:3000](http://localhost:3000) を開いてください。
+
+### テスト
+
+```sh
+bundle exec rspec
+```
+
+### Docker Compose での起動
+
+Docker Desktop を起動した状態で、次を実行します。
+
+```sh
+docker compose up --build
+```
+
+起動後、[http://localhost:3000](http://localhost:3000) を開いてください。停止するには `Ctrl+C` を押します。SQLite の開発用データベースは Docker ボリュームに保存されます。
+
+```sh
+docker compose down
+```
+
+データベースも含めてコンテナ環境を削除したい場合は、`docker compose down --volumes` を実行します。
+
+## データの取り扱い
+
+- タスクは、このブラウザ・この端末だけに保存されます。別の端末やブラウザには自動で同期されません。
+- ブラウザのサイトデータを削除すると、保存したタスクも削除されます。
+- バックアップファイルにはタスク・メモ・報告内容が含まれます。安全な場所に保管してください。
+
+## 本番環境
+
+Cloud Run では `SECRET_KEY_BASE` をシークレットとして設定してください。
+
+コンテナ内の SQLite ファイルは永続化されませんが、このアプリのタスクはブラウザのローカルストレージに保存されるため、通常の利用には影響しません。

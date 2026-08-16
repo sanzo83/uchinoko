@@ -1,0 +1,71 @@
+main.local-tasks data-controller="local-tasks"
+  header.local-tasks__header
+    p.local-tasks__eyebrow お迎え準備
+    h1 ねこを迎える準備
+    p.local-tasks__lead このスマホだけに保存される、気軽なやることリストです。
+
+  section.task-starter aria-label="保護猫お迎えチェックリスト"
+    h2 保護猫を迎えるなら
+    p.task-starter__description お迎え前からトライアル中までの基本項目を、まとめて追加できます。
+    button.button.button--secondary type="button" data-action="local-tasks#addCatChecklist" お迎えチェックリストを追加
+    p.task-starter__notice aria-live="polite" data-local-tasks-target="presetNotice"
+
+  section.task-composer aria-label="新しいタスク"
+    h2 やることを追加
+    form data-action="submit->local-tasks#add"
+      label.task-composer__label for="task-title" 内容
+      input#task-title.task-composer__input type="text" placeholder="例：キャリーケースを用意する" maxlength="100" required=true autocomplete="off" data-local-tasks-target="title"
+      label.task-composer__label for="task-note" メモ（任意）
+      textarea#task-note.task-composer__input.task-composer__input--note rows="2" placeholder="サイズや購入先など" maxlength="500" data-local-tasks-target="note"
+      .task-composer__footer
+        button.button.button--primary type="submit" 追加する
+
+  section.task-list-section aria-label="やること一覧"
+    .task-list-section__bar
+      h2 やること
+      p.task-count aria-live="polite" data-local-tasks-target="count"
+    .task-filters role="group" aria-label="表示を絞り込む"
+      button.task-filter.is-active type="button" data-filter="open" data-action="local-tasks#filter" 未完了
+      button.task-filter type="button" data-filter="all" data-action="local-tasks#filter" すべて
+      button.task-filter type="button" data-filter="done" data-action="local-tasks#filter" 完了済み
+    ul.task-list data-local-tasks-target="list"
+    p.task-empty data-local-tasks-target="empty" まずはひとつ、やることを書いてみましょう。
+
+  section.daily-report aria-label="保護主さんへの報告"
+    .daily-report__heading
+      div
+        p.daily-report__eyebrow トライアル中
+        h2 今日の報告
+      p.daily-report__count aria-live="polite" data-local-tasks-target="reportCount"
+    p.daily-report__description 食事や体調を記録して、保護主さんへ送る文章を作れます。
+    form.report-composer data-action="submit->local-tasks#addReport"
+      label.task-composer__label for="report-date" 日付
+      input#report-date.task-composer__input type="date" required=true data-local-tasks-target="reportDate"
+      label.task-composer__label for="report-food" 食事・水分
+      textarea#report-food.task-composer__input.task-composer__input--note rows="2" maxlength="500" placeholder="例：ごはんを完食。お水もよく飲めています。" data-local-tasks-target="reportFood"
+      label.task-composer__label for="report-toilet" 排泄
+      textarea#report-toilet.task-composer__input.task-composer__input--note rows="2" maxlength="500" placeholder="例：おしっこ2回、うんち1回。いつもどおりです。" data-local-tasks-target="reportToilet"
+      label.task-composer__label for="report-condition" 元気・体調
+      textarea#report-condition.task-composer__input.task-composer__input--note rows="2" maxlength="500" placeholder="例：朝は少し隠れていましたが、夜は遊んでいました。" data-local-tasks-target="reportCondition"
+      label.task-composer__label for="report-note" 今日の様子（任意）
+      textarea#report-note.task-composer__input.task-composer__input--note rows="2" maxlength="500" placeholder="例：窓辺で日向ぼっこをしていました。" data-local-tasks-target="reportNote"
+      label.task-composer__label for="report-question" 相談したいこと（任意）
+      textarea#report-question.task-composer__input.task-composer__input--note rows="2" maxlength="500" placeholder="例：爪切りはいつ頃から始めてもよいでしょうか？" data-local-tasks-target="reportQuestion"
+      .task-composer__footer
+        button.button.button--primary type="submit" 報告を保存する
+    p.daily-report__notice aria-live="polite" data-local-tasks-target="reportNotice"
+    ul.report-list data-local-tasks-target="reportList"
+    p.task-empty data-local-tasks-target="reportEmpty" まだ報告はありません。今日の様子を残してみましょう。
+
+  section.task-backup aria-label="バックアップと復元"
+    h2 バックアップ
+    p.task-backup__description 機種変更やブラウザを替える前に、ファイルへ保存しておけます。
+    .task-backup__actions
+      button.button.button--secondary type="button" data-action="local-tasks#downloadBackup" バックアップを保存
+      label.button.button--secondary.task-backup__restore
+        | バックアップを復元
+        input type="file" accept="application/json,.json" data-local-tasks-target="backupFile" data-action="change->local-tasks#restoreBackup"
+    p.task-backup__notice aria-live="polite" data-local-tasks-target="backupNotice"
+
+  p.local-tasks__privacy
+    | 保存先はこのブラウザです。別のスマホやブラウザには同期されません。

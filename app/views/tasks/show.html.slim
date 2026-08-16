@@ -11,7 +11,7 @@ table.table.table-hover
             td= @task.name
         tr
             th= Task.human_attribute_name(:description)
-            td= auto_link(simple_format(h(@task.description), {}, sanitize: false, wrapper_tag: 'div'))
+            td= simple_format(@task.description)
         tr
             th= Task.human_attribute_name(:image)
             td= image_tag @task.image if @task.image.attached?
@@ -23,4 +23,3 @@ table.table.table-hover
             td= @task.updated_at
 = link_to '編集', edit_task_path, class: 'btn btn-primary mr-3'
 = link_to '削除', @task, method: :delete, data: { confirm: "タスク「#{@task.name}」を削除します。よろしいですか？"}, class: 'btn btn-danger'
-                    
