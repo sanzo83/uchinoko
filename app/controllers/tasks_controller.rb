@@ -2,8 +2,9 @@ class TasksController < ApplicationController
 before_action :set_task, only: [:show, :edit, :update, :destroy]
 
   def index
-    @q = current_user.tasks.ransack(params[:q])
-    @tasks = @q.result(distinct: true).page(params[:page])
+    @tasks = current_user.tasks.recent
+    @tasks = @tasks.where("name LIKE ?", "%#{params.dig(:q, :name_cont)}%") if params.dig(:q, :name_cont).present?
+    @tasks = @tasks.where("created_at >= ?", params.dig(:q, :created_at_gteq)) if params.dig(:q, :created_at_gteq).present?
 
     respond_to do |format|
       format.html

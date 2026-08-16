@@ -1,0 +1,71 @@
+:root {
+  color: #27342d;
+  background: #f8f7f1;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  line-height: 1.5;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, input, textarea { font: inherit; }
+
+.app-nav {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 1rem 1.25rem;
+}
+
+.app-nav__brand { color: #315d48; font-weight: 800; text-decoration: none; }
+.alert-success { background: #d9eadc; border-radius: .6rem; color: #214b37; margin: 0 auto; max-width: 39.5rem; padding: .7rem .9rem; }
+
+.local-tasks { max-width: 42rem; margin: 0 auto; padding: 1.25rem 1.25rem 3rem; }
+.local-tasks__header { margin: 1rem 0 2rem; }
+.local-tasks__eyebrow { color: #c36a3c; font-size: .875rem; font-weight: 700; margin: 0 0 .35rem; }
+h1, h2, p { margin-top: 0; }
+h1 { font-size: clamp(2rem, 8vw, 3rem); letter-spacing: -.04em; line-height: 1.12; margin-bottom: .7rem; }
+h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+.local-tasks__lead { color: #647067; margin-bottom: 0; }
+
+.task-starter, .task-composer, .task-list-section, .task-backup { background: #fff; border: 1px solid #e5e2d9; border-radius: 1.25rem; box-shadow: 0 .4rem 1.5rem #2031280a; padding: 1.25rem; }
+.task-starter { margin-bottom: 1rem; }
+.task-starter__description { color: #647067; font-size: .9rem; }
+.task-starter__notice { color: #315d48; font-size: .85rem; margin: .8rem 0 0; min-height: 1.3rem; }
+.task-composer { margin-bottom: 1rem; }
+.task-composer__label { display: block; font-size: .875rem; font-weight: 700; margin: .8rem 0 .35rem; }
+.task-composer__label:first-of-type { margin-top: 0; }
+.task-composer__input { border: 1px solid #cfd4ca; border-radius: .75rem; min-height: 2.9rem; padding: .7rem .8rem; resize: vertical; width: 100%; }
+.task-composer__input:focus { border-color: #477a5d; box-shadow: 0 0 0 3px #477a5d22; outline: 0; }
+.task-composer__input--note { min-height: 4.6rem; }
+.task-composer__footer { display: flex; justify-content: flex-end; margin-top: 1rem; }
+.button { border: 0; border-radius: .75rem; cursor: pointer; font-weight: 800; min-height: 2.8rem; padding: .55rem 1rem; }
+.button--primary { background: #315d48; color: white; }
+.button--secondary { background: #edf0e8; color: #315d48; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+
+.task-list-section__bar { align-items: center; display: flex; justify-content: space-between; }
+.task-list-section__bar h2 { margin-bottom: 0; }
+.task-count { color: #c36a3c; font-size: .875rem; font-weight: 800; margin: 0; }
+.task-filters { display: flex; gap: .4rem; margin: 1rem 0; overflow-x: auto; }
+.task-filter { background: #edf0e8; border: 0; border-radius: 999px; color: #526057; cursor: pointer; padding: .45rem .8rem; white-space: nowrap; }
+.task-filter.is-active { background: #d9eadc; color: #214b37; font-weight: 800; }
+.task-list { display: grid; gap: .65rem; list-style: none; margin: 0; padding: 0; }
+.task-group { color: #c36a3c; font-size: .85rem; font-weight: 800; margin-top: .55rem; }
+.task-group:first-child { margin-top: 0; }
+.task-card { align-items: flex-start; background: #fafbf8; border: 1px solid #e6e9e2; border-radius: .85rem; display: grid; gap: .7rem; grid-template-columns: auto 1fr auto; padding: .8rem; }
+.task-card__checkbox { accent-color: #315d48; height: 1.25rem; margin: .15rem 0 0; width: 1.25rem; }
+.task-card__title { font-weight: 700; margin: 0; overflow-wrap: anywhere; }
+.task-card__note { color: #667169; font-size: .9rem; margin: .25rem 0 0; overflow-wrap: anywhere; }
+.task-card.is-complete .task-card__title { color: #859087; text-decoration: line-through; }
+.task-card__remove { background: transparent; border: 0; color: #9a5f4b; cursor: pointer; font-size: .8rem; padding: .2rem; }
+.task-empty { color: #748078; margin: 1.5rem 0 .2rem; text-align: center; }
+.task-backup { margin-top: 1rem; }
+.task-backup__description { color: #647067; font-size: .9rem; }
+.task-backup__actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+.task-backup__restore { cursor: pointer; }
+.task-backup__restore input { height: 1px; overflow: hidden; position: absolute; width: 1px; clip: rect(0 0 0 0); }
+.task-backup__notice { color: #315d48; font-size: .85rem; margin: .8rem 0 0; min-height: 1.3rem; }
+.local-tasks__privacy { color: #748078; font-size: .78rem; margin: 1.2rem .3rem 0; }
+
+@media (min-width: 48rem) {
+  .local-tasks { padding-top: 2rem; }
+  .task-starter, .task-composer, .task-list-section, .task-backup { padding: 1.5rem; }
+}

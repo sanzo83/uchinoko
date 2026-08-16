@@ -1,27 +1,23 @@
 h1 タスク一覧
 
-= search_form_for @q, class: 'mb-5' do |f|
+= form_with scope: :q, url: tasks_path, method: :get, class: 'mb-5' do |f|
   .form-group.row
     = f.label :name_cont, '名称', class: 'col-sm-2 col-form-label'
     .col-sm-10
-      = f.search_field :name_cont, class: 'form-control'
+      = f.search_field :name_cont, value: params.dig(:q, :name_cont), class: 'form-control'
   .form-group.row
     = f.label :created_at_gteq, '登録日時', class: 'col-sm-2 col-form-label'
     .col-sm-10
-      = f.search_field :created_at_gteq, class: 'form-control' 
+      = f.search_field :created_at_gteq, value: params.dig(:q, :created_at_gteq), class: 'form-control'
   .form-group
     = f.submit class: 'btn btn-outline-primary'
 
 = link_to  '新規登録', new_task_path, class: 'btn btn-primary' 
 
-.mb-3
-  = paginate @tasks
-  = page_entries_info @tasks
-  
 table.table.table-hover
   thead.thead-default
     tr
-      th= sort_link(@q, :name)
+      th 名称
       th= Task.human_attribute_name(:name)
       th= Task.human_attribute_name(:created_at)
       th
