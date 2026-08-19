@@ -18,6 +18,23 @@ button, input, textarea { font: inherit; }
 .app-nav__brand { color: #315d48; font-weight: 800; text-decoration: none; }
 .alert-success { background: #d9eadc; border-radius: .6rem; color: #214b37; margin: 0 auto; max-width: 39.5rem; padding: .7rem .9rem; }
 
+.landing { max-width: 42rem; margin: 0 auto; padding: .4rem 1.25rem 3rem; }
+.landing-hero { background: #315d48; border-radius: 1.5rem; color: #fff; overflow: hidden; padding: 2rem 1.5rem; position: relative; }
+.landing-hero::after { background: #f1b27e; border-radius: 50%; content: ""; height: 10rem; opacity: .32; position: absolute; right: -4rem; top: -4rem; width: 10rem; }
+.landing-hero__eyebrow { color: #f4c49c; font-size: .85rem; font-weight: 800; margin-bottom: .5rem; position: relative; }
+.landing-hero h1 { font-size: clamp(2.5rem, 11vw, 4.1rem); margin-bottom: 1rem; position: relative; }
+.landing-hero__lead { font-size: 1rem; line-height: 1.8; margin-bottom: 1.5rem; position: relative; }
+.landing-hero__cta { background: #fff; color: #315d48; position: relative; }
+.landing-hero__note { color: #d9eadc; font-size: .78rem; margin: .9rem 0 0; position: relative; }
+.landing-features { display: grid; gap: .8rem; margin: 1rem 0; }
+.landing-feature { background: #fff; border: 1px solid #e5e2d9; border-radius: 1.1rem; padding: 1.15rem; }
+.landing-feature__number { color: #c36a3c; font-size: .78rem; font-weight: 800; letter-spacing: .08em; }
+.landing-feature h2 { font-size: 1.05rem; margin: .45rem 0; }
+.landing-feature p { color: #647067; font-size: .9rem; margin-bottom: 0; }
+.landing-privacy { background: #fff8f2; border: 1px solid #efdbc9; border-radius: 1.1rem; padding: 1.2rem; }
+.landing-privacy h2 { margin-bottom: .55rem; }
+.landing-privacy p { color: #647067; font-size: .9rem; }
+
 .local-tasks { max-width: 42rem; margin: 0 auto; padding: 1.25rem 1.25rem 3rem; }
 .local-tasks__header { margin: 1rem 0 2rem; }
 .local-tasks__eyebrow { color: #c36a3c; font-size: .875rem; font-weight: 700; margin: 0 0 .35rem; }
@@ -40,6 +57,7 @@ h2 { font-size: 1.1rem; margin-bottom: 1rem; }
 .button { border: 0; border-radius: .75rem; cursor: pointer; font-weight: 800; min-height: 2.8rem; padding: .55rem 1rem; }
 .button--primary { background: #315d48; color: white; }
 .button--secondary { background: #edf0e8; color: #315d48; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.button--danger { background: #fff0eb; color: #9a5f4b; }
 
 .task-list-section__bar { align-items: center; display: flex; justify-content: space-between; }
 .task-list-section__bar h2 { margin-bottom: 0; }
@@ -82,6 +100,9 @@ h2 { font-size: 1.1rem; margin-bottom: 1rem; }
 .report-card__copy { margin-top: .8rem; min-height: 2.4rem; }
 
 @media (min-width: 48rem) {
+  .landing { padding-top: 1rem; }
+  .landing-hero { padding: 3rem 2.5rem; }
+  .landing-features { grid-template-columns: repeat(3, 1fr); }
   .local-tasks { padding-top: 2rem; }
   .task-starter, .task-composer, .task-list-section, .task-backup, .daily-report { padding: 1.5rem; }
 }
