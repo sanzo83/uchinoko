@@ -65,6 +65,7 @@ main.local-tasks data-controller="local-tasks"
       label.button.button--secondary.task-backup__restore
         | バックアップを復元
         input type="file" accept="application/json,.json" data-local-tasks-target="backupFile" data-action="change->local-tasks#restoreBackup"
+      button.button.button--danger type="button" data-action="local-tasks#clearAllData" すべて削除
     p.task-backup__notice aria-live="polite" data-local-tasks-target="backupNotice"
 
   p.local-tasks__privacy

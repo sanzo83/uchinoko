@@ -186,6 +186,22 @@ export default class extends Controller {
     }
   }
 
+  clearAllData() {
+    if (this.tasks.length === 0 && this.reports.length === 0) {
+      this.setBackupNotice("削除するタスクや報告はありません。")
+      return
+    }
+
+    if (!window.confirm("タスクと報告をすべて削除しますか？ この操作は元に戻せません。")) return
+    if (!window.confirm("本当にすべて削除しますか？ 必要であれば先にバックアップを保存してください。")) return
+
+    this.tasks = []
+    this.reports = []
+    this.save()
+    this.saveReports()
+    window.location.assign("/")
+  }
+
   render() {
     const visibleTasks = this.tasks.filter((task) => this.visible(task))
     this.listTarget.replaceChildren(...this.groupedTaskElements(visibleTasks))

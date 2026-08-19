@@ -1,0 +1,29 @@
+main.landing data-controller="landing" data-landing-todo-url-value=local_tasks_path
+  section.landing-hero aria-labelledby="landing-title"
+    p.landing-hero__eyebrow 保護猫を迎える準備に
+    h1#landing-title うちのこになるまで
+    p.landing-hero__lead
+      | お迎え前のやることも、トライアル中の毎日の報告も。
+      br
+      | そばにいる小さな家族のために、ひとつずつ整えていけるリストです。
+    = link_to '準備をはじめる', local_tasks_path, class: 'button button--primary landing-hero__cta'
+    p.landing-hero__note アカウント登録なし・無料で使えます
+
+  section.landing-features aria-label="できること"
+    article.landing-feature
+      span.landing-feature__number 01
+      h2 お迎えの準備を
+      p ケージやキャリーケース、脱走対策など、必要なことをチェックリストで確認できます。
+    article.landing-feature
+      span.landing-feature__number 02
+      h2 毎日の様子を記録
+      p 食事・排泄・体調を残して、トライアル中の変化を見守れます。
+    article.landing-feature
+      span.landing-feature__number 03
+      h2 報告文をすぐ作れる
+      p 記録から保護主さんへ送る文章を作り、コピーしていつもの連絡先で送れます。
+
+  section.landing-privacy aria-label="データの保存先"
+    h2 あなたのスマホの中だけに保存
+    p タスクと報告はこのブラウザに保存されます。別の端末に同期されないので、機種変更の前にはバックアップを保存してください。
+    = link_to '準備をはじめる', local_tasks_path, class: 'button button--secondary'
